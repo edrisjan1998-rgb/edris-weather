@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هواشناسی و اخبار | Mr.Edris</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- ستون چپ -->
+    <aside class="left-col">
+
+        <!-- کارت آب و هوا -->
+        <div class="card">
+            <div class="search-inside">
+                <div class="city-search-wrap">
+                    <input type="text" id="cityInput"
+                           placeholder="🔍 جستجوی شهر..."
+                           autocomplete="off"
+                           oninput="onCityInput()"
+                           onkeypress="if(event.key==='Enter') searchCity()"/>
+                    <div class="city-dropdown" id="cityDropdown"></div>
+                </div>
+                <button onclick="searchCity()">جستجو</button>
+            </div>
+            <div id="currentWeather">
+                <div class="loading-box">⏳ در حال دریافت...</div>
+            </div>
+            <div class="tab-row">
+                <button class="tab-btn" id="btn-past" onclick="showTab('past',this)">📅 ۱۵ روز گذشته</button>
+                <button class="tab-btn" id="btn-future" onclick="showTab('future',this)">🔮 ۱۵ روز آینده</button>
+            </div>
+            <div id="weatherCards" style="display:none"></div>
+        </div>
+
+        <!-- اخبار جهان -->
+        <div class="card news-card-wrap">
+            <div class="card-head">
+                <span>🌍 اخبار مهم جهان</span>
+                <div class="card-head-controls">
+                    <select id="newsSource" onchange="fetchNews()">
+                        <option value="bbc">🔴 BBC فارسی</option>
+                        <option value="dw">🟡 دویچه وله</option>
+                        <option value="voa">🔵 صدای آمریکا</option>
+                    </select>
+                    <button class="icon-btn" onclick="fetchNews()">🔄</button>
+                </div>
+            </div>
+            <div id="newsContainer">
+                <div class="loading-box">⏳ در حال دریافت...</div>
+            </div>
+        </div>
+
+        <!-- اخبار ورزشی -->
+        <div class="card news-card-wrap">
+            <div class="card-head">
+                <span>⚽ اخبار ورزشی</span>
+                <div class="card-head-controls">
+                    <select id="sportSource" onchange="fetchSports()">
+                        <option value="sport_varzesh3">⚽ ورزش سه</option>
+                        <option value="sport_isna">🏅 ایسنا ورزشی</option>
+                        <option value="sport_football">🏆 فوتبال ۳۶۰</option>
+                    </select>
+                    <button class="icon-btn" onclick="fetchSports()">🔄</button>
+                </div>
+            </div>
+            <div id="sportsContainer">
+                <div class="loading-box">⏳ در حال دریافت...</div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ستون راست -->
+    <main class="right-col">
+
+        <!-- تب‌های بالا -->
+        <div class="right-tabs">
+            <button class="right-tab active" onclick="switchPanel('news',this)">
+                📰 اخبار
+            </button>
+            <button class="right-tab" onclick="switchPanel('wiki',this)">
+                🔍 ویکی‌پدیا
+            </button>
+            <button class="right-tab" onclick="switchPanel('ai',this)">
+                🤖 هوش مصنوعی
+            </button>
+        </div>
+
+        <!-- پنل خبر -->
+        <div class="panel" id="panel-news">
+            <div class="panel-empty">
+                <span>📰</span>
+                <p>روی هر خبر کلیک کنید تا اینجا نمایش داده شود</p>
+            </div>
+        </div>
+
+        <!-- پنل ویکی‌پدیا -->
+        <div class="panel" id="panel-wiki" style="display:none">
+            <div class="wiki-search-box">
+                <div class="wiki-logo">
+                    <span class="wiki-w">W</span>
+                    <span class="wiki-text">ویکی‌پدیا</span>
+                </div>
+                <div class="wiki-input-wrap">
+                    <input type="text" id="wikiInput"
+                           placeholder="جستجو در ویکی‌پدیا..."
+                           onkeypress="if(event.key==='Enter') searchWiki()"
+                           autocomplete="off"/>
+                    <button onclick="searchWiki()">🔍 جستجو</button>
+                </div>
+                <div class="wiki-lang-btns">
+                    <button class="lang-btn active" onclick="setWikiLang('fa',this)">فارسی</button>
+                    <button class="lang-btn" onclick="setWikiLang('en',this)">English</button>
+                    <button class="lang-btn" onclick="setWikiLang('ar',this)">العربية</button>
+                </div>
+            </div>
+            <div id="wikiResult" class="wiki-result">
+                <div class="panel-empty">
+                    <span>🔍</span>
+                    <p>هر موضوعی را جستجو کنید</p>
+                    <small>تاریخ، علم، جغرافیا، شخصیت‌ها...</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- پنل هوش مصنوعی -->
+        <div class="panel" id="panel-ai" style="display:none">
+            <div class="ai-header">
+                <div class="ai-logo">
+                    <span class="ai-icon">🤖</span>
+                    <span class="ai-title">دستیار هوش مصنوعی</span>
+                    <span class="ai-badge">Powered by AI</span>
+                </div>
+                <div class="ai-model-select">
+                    <button class="model-btn active" onclick="setAiModel('pollinations',this)">🌸 Pollinations</button>
+                    <button class="model-btn" onclick="setAiModel('openrouter',this)">⚡ OpenRouter</button>
+                </div>
+            </div>
+
+            <!-- تاریخچه چت -->
+            <div class="ai-chat-history" id="aiChatHistory">
+                <div class="ai-welcome">
+                    <div class="ai-welcome-icon">🤖</div>
+                    <div class="ai-welcome-title">سلام! من دستیار هوش مصنوعی هستم</div>
+                    <div class="ai-welcome-desc">هر سوالی دارید بپرسید. درباره اخبار، ورزش، علم یا هر موضوع دیگری...</div>
+                    <div class="ai-suggestions">
+                        <button onclick="askAI('آخرین اخبار فوتبال اروپا را توضیح بده')">⚽ اخبار فوتبال</button>
+                        <button onclick="askAI('وضعیت آب و هوای هرات را توضیح بده')">🌤️ آب و هوا</button>
+                        <button onclick="askAI('مهم‌ترین اخبار جهان این هفته چیست؟')">🌍 اخبار جهان</button>
+                        <button onclick="askAI('یک جوک بامزه بگو')">😄 سرگرمی</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ورودی چت -->
+            <div class="ai-input-area">
+                <div class="ai-input-wrap">
+                    <textarea id="aiInput"
+                              placeholder="سوال خود را بنویسید..."
+                              rows="1"
+                              onkeydown="aiKeyDown(event)"
+                              oninput="autoResize(this)"></textarea>
+                    <button class="ai-send-btn" onclick="sendAiMessage()" id="aiSendBtn">
+                        <span>ارسال</span>
+                        <span>➤</span>
+                    </button>
+                </div>
+                <div class="ai-input-hint">Enter برای ارسال | Shift+Enter برای خط جدید</div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- فوتر -->
+<footer class="site-footer">
+    <span>تهیه کننده</span>
+    <span class="footer-name">Mr.Edris</span>
+    <span class="footer-heart">❤️</span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
